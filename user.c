@@ -29,7 +29,7 @@ int main()
     /* fgets(buf, ??, stdin); */
     // Write that line to file, update shared memory with size of the line
     op.sem_op = 1;
-    printf("Releasing semaphore");
+    printf("Releasing semaphore\n");
     semop(semid, &op, 1);
     return 0;
 }
