@@ -24,10 +24,16 @@ int main()
     printf("Getting semaphore...\n");
     semop(semid, &op, 1);
     printf("Got semaphore!\n");
+    
     // TODO:
     // Display last line in "story.txt" (use shared memory to determine size of last line)
-    /* fgets(buf, ??, stdin); */
-    // Write that line to file, update shared memory with size of the line
+
+    printf("What should the next line be?\n");
+    char *buf = malloc(10);
+    fgets(buf, 10, stdin);
+
+    // Write that line story.txt, update shared memory with size of the line
+
     op.sem_op = 1;
     printf("Releasing semaphore\n");
     semop(semid, &op, 1);
