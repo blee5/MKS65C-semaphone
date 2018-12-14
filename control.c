@@ -32,26 +32,38 @@ void setup()
         printf("Error creating file: %s\n", strerror(errno));
     }
     int semid = semget(KEY, 1, IPC_CREAT | IPC_EXCL | 0644);
+    union semun su;
     if (semid < 0)
     {
         printf("Error creating semaphore: %s\n", strerror(errno));
     }
+    su.val = 1;
+    semctl(semid, 0, SETVAL, su);
 }
 
 void cleanup()
 {
+    int semid = semget(KEY, 1, 0);
+    if (semid < 0)
+    {
+        printf("Error getting semaphore: %s\n", strerror(errno));
+        exit(1);
+    }
+    struct sembuf op;
+    op.sem_num = 0;
+    op.sem_op = -1;
+    op.sem_flg = SEM_UNDO;
+    printf("Getting semaphore...\n");
+    semop(semid, &op, 1);
+    printf("Got semaphore!\n");
+    semctl(semid, 0, IPC_RMID, 0);
+
     int shmid = shmget(KEY, 500, 0);
     if (shmid < 0)
     {
         printf("Error removing shared memory: %s\n", strerror(errno));
     }
     shmctl(shmid, IPC_RMID, NULL);
-    int semid = semget(KEY, 1, 0);
-    if (semid < 0)
-    {
-        printf("Error removing semaphore: %s\n", strerror(errno));
-    }
-    semctl(semid, 0, IPC_RMID, 0);
     if (remove("story.txt") < 0)
     {
         printf("Error removing file: %s\n", strerror(errno));
